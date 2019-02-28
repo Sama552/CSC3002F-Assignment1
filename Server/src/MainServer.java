@@ -2,6 +2,10 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -13,17 +17,67 @@ public class MainServer extends javax.swing.JFrame {
     private ServerSocket server;
     private int totalClients = 100;
     private int port = 6789;
-  
+
     public MainServer() {
-        
+
         initComponents();
         this.setTitle("Server");
         this.setVisible(true);
         status.setVisible(true);
     }
-    
+
+
+
     public void startRunning()
     {
+        try {
+            ServerSocket server = new ServerSocket(port);
+            System.out.println("Waiting for a client....");
+
+            System.out.println("Got a client :) ... Finally, someone saw me through all the cover!");
+            System.out.println();
+            while(true) {
+                Socket socket = server.accept();
+
+                RunSocket rSocket = new RunSocket(socket);
+                Thread t = new Thread(rSocket);
+                t.start();
+                //System.out.println("Socket Stack Size-----"+socketMap.size());
+            }
+        }
+        catch (Exception e) { }
+
+    }
+
+    class RunSocket implements Runnable {
+        private Socket socket;
+
+        public RunSocket(Socket socket) {
+          this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+          try {
+              InputStream in = socket.getInputStream();
+              OutputStream out = socket.getOutputStream();
+
+              DataInputStream dataIn = new DataInputStream(in);
+              DataOutputStream dataOut = new DataOutputStream(out);
+
+              String line = null;
+              while (true) {
+                  line = dataIn.readUTF();
+                  System.out.println("Recievd the line----" + line);
+                  dataOut.writeUTF(line + " Comming back from the server");
+                  dataOut.flush();
+                  System.out.println("waiting for the next line....");
+                }
+              }
+          catch (Exception e) { }
+        }
+    }
+      /** old stuff
         try
         {
             server=new ServerSocket(port, totalClients);
@@ -51,11 +105,12 @@ public class MainServer extends javax.swing.JFrame {
         {
                 ioException.printStackTrace();
         }
-    }
-    
+        */
+
    private void whileChatting() throws IOException
    {
-        String message="";    
+     /** old stuff
+        String message="";
         jTextField1.setEditable(true);
         do{
                 try
@@ -64,10 +119,27 @@ public class MainServer extends javax.swing.JFrame {
                         chatArea.append("\n"+message);
                 }catch(ClassNotFoundException classNotFoundException)
                 {
-                        
+
                 }
         }while(!message.equals("Client - END"));
+        */
    }
+
+    private void sendMessage(String message)
+    {
+      /** old stuff
+        try
+        {
+            output.writeObject("Server - " + message);
+            output.flush();
+            chatArea.append("\nServer - "+message);
+        }
+        catch(IOException ioException)
+        {
+            chatArea.append("\n Unable to Send Message");
+        }
+        */
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -139,32 +211,17 @@ public class MainServer extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
+
         sendMessage(jTextField1.getText());
 	jTextField1.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        
+
         sendMessage(jTextField1.getText());
 	jTextField1.setText("");
     }//GEN-LAST:event_jTextField1ActionPerformed
 
-    private void sendMessage(String message)
-    {
-        try
-        {
-            output.writeObject("Server - " + message);
-            output.flush();
-            chatArea.append("\nServer - "+message);
-        }
-        catch(IOException ioException)
-        {
-            chatArea.append("\n Unable to Send Message");
-        }
-    }
-
-   
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea chatArea;
     private javax.swing.JButton jButton1;

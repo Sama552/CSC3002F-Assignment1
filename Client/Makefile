@@ -66,4 +66,4 @@ run : all
 	java -cp ./bin/ Client_1
 
 clean :
-	rm -rf $(BIN)* $(DOC)*
+	rm -rf $(BIN)*.class $(DOC)*
