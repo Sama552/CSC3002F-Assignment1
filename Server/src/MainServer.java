@@ -16,7 +16,7 @@ public class MainServer {
     private Socket connection;
     private ServerSocket server;
     private int totalClients = 100;
-    private int port = 6789;
+    private int port = 12000;
 
     public MainServer() {
 

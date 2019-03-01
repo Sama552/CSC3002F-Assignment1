@@ -22,7 +22,7 @@ public class Client extends javax.swing.JFrame {
     private String message="";
     private String serverIP;
     private Socket connection;
-    private int port = 6789;
+    private int port = 12000;
 
     private InputStream in;
     private OutputStream out;
