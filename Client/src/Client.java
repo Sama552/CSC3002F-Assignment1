@@ -1,8 +1,4 @@
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -23,6 +19,7 @@ public class Client extends javax.swing.JFrame {
     private String serverIP;
     private Socket connection;
     private int port = 12000;
+    private String name = "";
 
     private InputStream in;
     private OutputStream out;
@@ -31,9 +28,11 @@ public class Client extends javax.swing.JFrame {
     private DataOutputStream dOut;
 
 
-    public Client(String s) {
+    public Client(String s, String username) {
 
         initComponents();
+
+        this.name = username;
 
         this.setTitle("Client");
         this.setVisible(true);
@@ -67,6 +66,9 @@ public class Client extends javax.swing.JFrame {
 
             dIn = new DataInputStream(in);
             dOut = new DataOutputStream(out);
+
+            dOut.writeUTF(name);
+            dOut.flush();
 
             whileChatting();
        }

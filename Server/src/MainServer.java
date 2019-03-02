@@ -8,6 +8,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
 
 public class MainServer {
 
@@ -17,6 +20,8 @@ public class MainServer {
     private ServerSocket server;
     private int totalClients = 100;
     private int port = 12000;
+
+    public Map<String, Socket> users = new HashMap();
 
     public MainServer() {
 
@@ -32,6 +37,7 @@ public class MainServer {
             System.out.println();
             while(true) {
                 Socket socket = server.accept();
+
 
                 System.out.println("Got a client :) ... Finally, someone saw me through all the cover!");
                 System.out.println();
@@ -61,6 +67,11 @@ public class MainServer {
 
               DataInputStream dataIn = new DataInputStream(in);
               DataOutputStream dataOut = new DataOutputStream(out);
+
+              String name;
+              name = dataIn.readUTF();
+              users.put(name, socket);
+              printUsers();
 
               String line = null;
               while (true) {
@@ -103,6 +114,15 @@ public class MainServer {
                 ioException.printStackTrace();
         }
         */
+
+
+   private void printUsers(){
+     Set<String> names = users.keySet();
+
+     for (String s : names){
+       System.out.println(s);
+     }
+   }
 
    private void whileChatting() throws IOException
    {
