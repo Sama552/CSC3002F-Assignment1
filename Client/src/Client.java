@@ -1,12 +1,12 @@
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import javax.swing.JOptionPane;
@@ -18,20 +18,102 @@ public class Client extends javax.swing.JFrame {
     private String message="";
     private String serverIP;
     private Socket connection;
-    private int port = 6789;
-    
-    
-    public Client(String s) {
-        
+    private int port = 12000;
+    private String name = "";
+
+    private InputStream in;
+    private OutputStream out;
+
+    private DataInputStream dIn;
+    private DataOutputStream dOut;
+
+
+    public Client(String s, String username) {
+
         initComponents();
-        
+
+        this.name = username;
+
         this.setTitle("Client");
         this.setVisible(true);
         status.setVisible(true);
         serverIP = s;
     }
 
-    
+
+    public void startRunning()
+    {
+       try
+       {
+            status.setText("Attempting Connection ...");
+            try
+            {
+                connection = new Socket(InetAddress.getByName(serverIP),port);
+            }catch(IOException ioEception)
+            {
+                    JOptionPane.showMessageDialog(null,"Server Might Be Down!","Warning",JOptionPane.WARNING_MESSAGE);
+            }
+            status.setText("Connected to: " + connection.getInetAddress().getHostName());
+
+            /**
+            output = new ObjectOutputStream(connection.getOutputStream());
+            output.flush();
+            input = new ObjectInputStream(connection.getInputStream());
+            */
+
+            in = connection.getInputStream();
+            out = connection.getOutputStream();
+
+            dIn = new DataInputStream(in);
+            dOut = new DataOutputStream(out);
+
+            dOut.writeUTF(name);
+            dOut.flush();
+
+            whileChatting();
+       }
+       catch(IOException ioException)
+       {
+            ioException.printStackTrace();
+       }
+    }
+
+    private void whileChatting() throws IOException
+    {
+      jTextField1.setEditable(true);
+      do{
+              try
+              {
+                      //message = (String) input.readObject();
+                      message = dIn.readUTF();
+                      chatArea.append("\n"+message);
+              }
+              catch(IOException e)
+              {
+              }
+      }while(!message.equals("Client - END"));
+    }
+
+
+    private void sendMessage(String message)
+    {
+        try
+        {
+          dOut.writeUTF(message);
+          dOut.flush();
+          chatArea.append("\nClient - "+message);
+          /** old stuff
+            output.writeObject("Client - " + message);
+            output.flush();
+            chatArea.append("\nClient - "+message);
+          */
+        }
+        catch(IOException ioException)
+        {
+            chatArea.append("\n Unable to Send Message");
+        }
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -114,65 +196,7 @@ public class Client extends javax.swing.JFrame {
 	jTextField1.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    
-    public void startRunning()
-    {
-       try
-       {
-            status.setText("Attempting Connection ...");
-            try
-            {
-                connection = new Socket(InetAddress.getByName(serverIP),port);
-            }catch(IOException ioEception)
-            {
-                    JOptionPane.showMessageDialog(null,"Server Might Be Down!","Warning",JOptionPane.WARNING_MESSAGE);
-            }
-            status.setText("Connected to: " + connection.getInetAddress().getHostName());
 
-
-            output = new ObjectOutputStream(connection.getOutputStream());
-            output.flush();
-            input = new ObjectInputStream(connection.getInputStream());
-
-            whileChatting();
-       }
-       catch(IOException ioException)
-       {
-            ioException.printStackTrace();
-       }
-    }
-    
-    private void whileChatting() throws IOException
-    {
-      jTextField1.setEditable(true);
-      do{
-              try
-              {
-                      message = (String) input.readObject();
-                      chatArea.append("\n"+message);
-              }
-              catch(ClassNotFoundException classNotFoundException)
-              {
-              }
-      }while(!message.equals("Client - END"));
-    }
-  
-    
-    private void sendMessage(String message)
-    {
-        try
-        {
-            output.writeObject("Client - " + message);
-            output.flush();
-            chatArea.append("\nClient - "+message);
-        }
-        catch(IOException ioException)
-        {
-            chatArea.append("\n Unable to Send Message");
-        }
-    }
-  
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea chatArea;
     private javax.swing.JButton jButton1;

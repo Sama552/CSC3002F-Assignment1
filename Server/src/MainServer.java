@@ -2,28 +2,90 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
 
-public class MainServer extends javax.swing.JFrame {
+public class MainServer {
 
     private ObjectOutputStream output;
     private ObjectInputStream input;
     private Socket connection;
     private ServerSocket server;
     private int totalClients = 100;
-    private int port = 6789;
-  
+    private int port = 12000;
+
+    public Map<String, Socket> users = new HashMap();
+
     public MainServer() {
-        
-        initComponents();
-        this.setTitle("Server");
-        this.setVisible(true);
-        status.setVisible(true);
+
     }
-    
+
+
+
     public void startRunning()
     {
+        try {
+            ServerSocket server = new ServerSocket(port);
+            System.out.println("Waiting for a client....");
+            System.out.println();
+            while(true) {
+                Socket socket = server.accept();
+
+
+                System.out.println("Got a client :) ... Finally, someone saw me through all the cover!");
+                System.out.println();
+
+                RunSocket rSocket = new RunSocket(socket);
+                Thread t = new Thread(rSocket);
+                t.start();
+                //System.out.println("Socket Stack Size-----"+socketMap.size());
+            }
+        }
+        catch (Exception e) { }
+
+    }
+
+    class RunSocket implements Runnable {
+        private Socket socket;
+
+        public RunSocket(Socket socket) {
+          this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+          try {
+              InputStream in = socket.getInputStream();
+              OutputStream out = socket.getOutputStream();
+
+              DataInputStream dataIn = new DataInputStream(in);
+              DataOutputStream dataOut = new DataOutputStream(out);
+
+              String name;
+              name = dataIn.readUTF();
+              users.put(name, socket);
+              printUsers();
+
+              String line = null;
+              while (true) {
+                  line = dataIn.readUTF();
+                  System.out.println("Recievd the line----" + line);
+                  dataOut.writeUTF(line + " Comming back from the server");
+                  dataOut.flush();
+                  System.out.println("waiting for the next line....");
+                }
+              }
+          catch (Exception e) { }
+        }
+    }
+      /** old stuff
         try
         {
             server=new ServerSocket(port, totalClients);
@@ -51,11 +113,21 @@ public class MainServer extends javax.swing.JFrame {
         {
                 ioException.printStackTrace();
         }
-    }
-    
+        */
+
+
+   private void printUsers(){
+     Set<String> names = users.keySet();
+
+     for (String s : names){
+       System.out.println(s);
+     }
+   }
+
    private void whileChatting() throws IOException
    {
-        String message="";    
+     /** old stuff
+        String message="";
         jTextField1.setEditable(true);
         do{
                 try
@@ -64,94 +136,15 @@ public class MainServer extends javax.swing.JFrame {
                         chatArea.append("\n"+message);
                 }catch(ClassNotFoundException classNotFoundException)
                 {
-                        
+
                 }
         }while(!message.equals("Client - END"));
+        */
    }
-
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
-
-        jPanel1 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        chatArea = new javax.swing.JTextArea();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        status = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jPanel1.setLayout(null);
-
-        chatArea.setColumns(20);
-        chatArea.setRows(5);
-        jScrollPane1.setViewportView(chatArea);
-
-        jPanel1.add(jScrollPane1);
-        jScrollPane1.setBounds(30, 110, 360, 270);
-
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jTextField1);
-        jTextField1.setBounds(30, 50, 270, 30);
-
-        jButton1.setText("Send");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jButton1);
-        jButton1.setBounds(310, 50, 80, 30);
-
-        status.setText("...");
-        jPanel1.add(status);
-        status.setBounds(30, 80, 300, 40);
-
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("Write your text here");
-        jPanel1.add(jLabel2);
-        jLabel2.setBounds(30, 30, 150, 20);
-
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bg7.jpg"))); // NOI18N
-        jPanel1.add(jLabel1);
-        jLabel1.setBounds(0, 0, 420, 405);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 417, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
-        );
-
-        setSize(new java.awt.Dimension(417, 425));
-        setLocationRelativeTo(null);
-    }// </editor-fold>//GEN-END:initComponents
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
-        sendMessage(jTextField1.getText());
-	jTextField1.setText("");
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        
-        sendMessage(jTextField1.getText());
-	jTextField1.setText("");
-    }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void sendMessage(String message)
     {
+      /** old stuff
         try
         {
             output.writeObject("Server - " + message);
@@ -162,17 +155,6 @@ public class MainServer extends javax.swing.JFrame {
         {
             chatArea.append("\n Unable to Send Message");
         }
+        */
     }
-
-   
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextArea chatArea;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JLabel status;
-    // End of variables declaration//GEN-END:variables
 }
