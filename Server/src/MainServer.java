@@ -1,3 +1,7 @@
+package Server;
+
+import Message.Message;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -86,12 +90,61 @@ public class MainServer {
 
               String line = null;
               while (true) { // where all the input and output is gonna happen
-                  //TODO
-                  line = (String) Oin.readObject(); // wait for an input
-                  System.out.println("Recievd the line----" + line);
-                  Oout.writeObject(line + " Comming back from the server");
-                  Oout.flush();
-                  System.out.println("waiting for the next line....");
+//                  //TODO
+//                  line = (String) Oin.readObject(); // wait for an input
+//                  System.out.println("Recievd the line----" + line);
+//                  Oout.writeObject(line + " Comming back from the server");
+//                  Oout.flush();
+//                  System.out.println("waiting for the next line....");
+
+                  /*--------------------------------------------------------------------------------------------------*/
+                  /* Modifications
+                  /*--------------------------------------------------------------------------------------------------*/
+                  Message message = (Message) Oin.readObject();
+
+                  // Process messages based on the flags.
+                  switch (message.getMessageFlag())
+                  {
+                      case "F":
+                      case "M":
+                      case "C":
+                          /* Here it's easier because we have a handle to the sender in the Message Object,
+                           * do something similar below.
+                           */
+                          if(!Message.isValidMsg(message))
+                          {
+                              // create output stream to the sender and send a 'resend request'.
+                              Socket senderConnection = users.get(message.getSenderName());
+                              ObjectOutputStream senderOutStream =
+                                      new ObjectOutputStream(senderConnection.getOutputStream());
+
+                              senderOutStream.writeObject(new Message(
+                                      "R",
+                                      "Server",
+                                      "Last communication was invalid. Please send again."));
+                              senderOutStream.flush();
+
+                              // house-keeping.
+                              senderOutStream.close();
+
+                              break;
+                          }
+                          // else continue to default processing.
+                      default: // valid messages or messages that don't require validation ('R', 'D')
+                          // TODO: ...
+                          Socket recipientConnection = users.get(/*Please add the correct name here*/"DUMMY_NAME");
+                          ObjectOutputStream recipientOutStream =
+                                  new ObjectOutputStream(recipientConnection.getOutputStream());
+
+                          recipientOutStream.writeObject(message);
+                          recipientOutStream.flush();
+
+                          // house-keeping.
+                          recipientOutStream.close();
+
+                          break;
+                  }
+                  /*--------------------------------------------------------------------------------------------------*/
                 }
               }
           catch (Exception e) { }
