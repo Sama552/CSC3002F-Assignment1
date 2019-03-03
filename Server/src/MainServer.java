@@ -4,8 +4,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
@@ -14,14 +12,13 @@ import java.util.Set;
 
 public class MainServer {
 
-    private ObjectOutputStream output;
-    private ObjectInputStream input;
+    private ObjectOutputStream Oout;
+    private ObjectInputStream Oin;
     private Socket connection;
     private ServerSocket server;
-    private int totalClients = 100;
     private int port = 12000;
 
-    public Map<String, Socket> users = new HashMap();
+    public Map<String, Socket> users = new HashMap(); // map of usernames to socket. Google documentation on how to use
 
     public MainServer() {
 
@@ -36,8 +33,7 @@ public class MainServer {
             System.out.println("Waiting for a client....");
             System.out.println();
             while(true) {
-                Socket socket = server.accept();
-
+                Socket socket = server.accept(); // wait for a new connection
 
                 System.out.println("Got a client :) ... Finally, someone saw me through all the cover!");
                 System.out.println();
@@ -45,7 +41,6 @@ public class MainServer {
                 RunSocket rSocket = new RunSocket(socket);
                 Thread t = new Thread(rSocket);
                 t.start();
-                //System.out.println("Socket Stack Size-----"+socketMap.size());
             }
         }
         catch (Exception e) { }
@@ -65,96 +60,48 @@ public class MainServer {
               InputStream in = socket.getInputStream();
               OutputStream out = socket.getOutputStream();
 
-              DataInputStream dataIn = new DataInputStream(in);
-              DataOutputStream dataOut = new DataOutputStream(out);
+              ObjectInputStream Oin = new ObjectInputStream(in);
+              ObjectOutputStream Oout = new ObjectOutputStream(out);
 
-              String name;
-              name = dataIn.readUTF();
-              users.put(name, socket);
-              printUsers();
+              String name = "";
+              try{ // get the username from the client (will be the first they send after connecting)
+                name = (String) Oin.readObject();
+              }catch(IOException e){
+                  e.printStackTrace();
+              }
+
+
+              if (users.containsKey(name)){ // check if username is taken OK if its available else closes the socket
+                Oout.writeObject("no");
+                Oout.flush();
+                socket.close();
+                throw new Exception();
+              }else{
+                Oout.writeObject("OK");
+                Oout.flush();
+              }
+
+              users.put(name, socket); // add the new username to the Map of usernames and Sockets
+              printUsers(); // Used for testing DELETE AFTER
 
               String line = null;
-              while (true) {
-                  line = dataIn.readUTF();
+              while (true) { // where all the input and output is gonna happen
+                  //TODO
+                  line = (String) Oin.readObject(); // wait for an input
                   System.out.println("Recievd the line----" + line);
-                  dataOut.writeUTF(line + " Comming back from the server");
-                  dataOut.flush();
+                  Oout.writeObject(line + " Comming back from the server");
+                  Oout.flush();
                   System.out.println("waiting for the next line....");
                 }
               }
           catch (Exception e) { }
         }
     }
-      /** old stuff
-        try
-        {
-            server=new ServerSocket(port, totalClients);
-            while(true)
-            {
-                try
-                {
-                    status.setText(" Waiting for Someone to Connect...");
-                    connection=server.accept();
-                    status.setText(" Now Connected to "+connection.getInetAddress().getHostName());
-
-
-                    output = new ObjectOutputStream(connection.getOutputStream());
-                    output.flush();
-                    input = new ObjectInputStream(connection.getInputStream());
-
-                    whileChatting();
-
-                }catch(EOFException eofException)
-                {
-                }
-            }
-        }
-        catch(IOException ioException)
-        {
-                ioException.printStackTrace();
-        }
-        */
-
 
    private void printUsers(){
      Set<String> names = users.keySet();
-
      for (String s : names){
        System.out.println(s);
      }
    }
-
-   private void whileChatting() throws IOException
-   {
-     /** old stuff
-        String message="";
-        jTextField1.setEditable(true);
-        do{
-                try
-                {
-                        message = (String) input.readObject();
-                        chatArea.append("\n"+message);
-                }catch(ClassNotFoundException classNotFoundException)
-                {
-
-                }
-        }while(!message.equals("Client - END"));
-        */
-   }
-
-    private void sendMessage(String message)
-    {
-      /** old stuff
-        try
-        {
-            output.writeObject("Server - " + message);
-            output.flush();
-            chatArea.append("\nServer - "+message);
-        }
-        catch(IOException ioException)
-        {
-            chatArea.append("\n Unable to Send Message");
-        }
-        */
-    }
 }

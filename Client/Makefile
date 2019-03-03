@@ -53,6 +53,12 @@ all : $(addprefix $(BIN), $(CLASS_FILES))
 bin/Client_1.class: bin/Client.class
 	$(COMPILE) src/Client_1.java
 
+bin/Welcome.class: bin/Connect.class
+	$(COMPILE) src/Welcome.java
+
+bin/Connect.class:
+	$(COMPILE) src/Connect.java
+
 bin/Client.class:
 	$(COMPILE) src/Client.java
 
