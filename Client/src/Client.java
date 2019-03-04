@@ -1,7 +1,7 @@
-package Client;
+//package Client;
 
-import Compress.CompressionUtils;
-import Message.Message;
+//import Compress.CompressionUtils;
+//import Message.Message;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.*;
 
-public class Client extends javax.swing.JFrame{
+public class Client extends javax.swing.JFrame implements Runnable{
     private final String downloadMsg = "Do you want to download file: %s; sent by %s of size: %d? [Y/N]";
     private String fileToDownload;
     private String defaultDownloadLocation = System.getProperty("user.home") + "\\Desktop";
@@ -28,9 +28,9 @@ public class Client extends javax.swing.JFrame{
     private Message message = null;
     private String serverIP;
     private Socket connection;
-    private int port = 6789;
     private boolean waitingForDownloadResponse = false;
 
+    private String otherClient = "";
     private String clientName = "";
     List<Message> messages = new ArrayList<>();
 
@@ -41,15 +41,16 @@ public class Client extends javax.swing.JFrame{
 //    private DataInputStream dIn;
 //    private DataOutputStream dOut;
 
-    public Client(String serverIp, String clientName){
-        
-        initComponents();
+    public Client(Socket socket, String s){
 
-        this.clientName = clientName;
-        this.setTitle(clientName);
-        this.setVisible(true);
-        status.setVisible(true);
-        this.serverIP = serverIp;
+        initComponents();
+        this.connection = socket;
+        this.otherClient = s;
+    }
+
+    @Override
+    public void run() {
+
     }
 
 //    public void signOff() throws IOException
@@ -104,7 +105,7 @@ public class Client extends javax.swing.JFrame{
 //        status.setText("Signed-on to: " + connection.getInetAddress().getHostName());
 //    }
 
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -181,7 +182,7 @@ public class Client extends javax.swing.JFrame{
     // TODO: REMOVE THIS PART
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_jTextField1ActionPerformed
 
-        sendMessage("M", jTextField1.getText());
+        sendMessage(jTextField1.getText(), "M");
 	    jTextField1.setText("");
     }//GEN-LAST:event_jTextField1ActionPerformed
 
@@ -191,7 +192,7 @@ public class Client extends javax.swing.JFrame{
          */
         if(waitingForDownloadResponse)
         {
-            sendMessage("D", fileToDownload + "|" + jTextField1.getText());
+            sendMessage(fileToDownload + "|" + jTextField1.getText(), "D");
             jTextField1.setText("");
 
             // change the flag.
@@ -207,55 +208,114 @@ public class Client extends javax.swing.JFrame{
         if(!uploadFileName.isEmpty())
         {
             sendMessage(
-                    "F",
-                    String.format(downloadMsg, uploadFileName, clientName, CompressionUtils.getFileSize(uploadFileName)));
+                    String.format(downloadMsg, uploadFileName, clientName, CompressionUtils.getFileSize(uploadFileName)),
+                    "F");
         }
         else
         {
-            sendMessage("M", jTextField1.getText());
+            sendMessage(jTextField1.getText(), "M");
             jTextField1.setText("");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-
-    public void startRunning()
-    {
-        try
+    public void receivedMessage(Message in){
+        message = in;
+        if("R".equals(message.getMessageFlag()))
         {
-            status.setText("Attempting Connection ...");
-            try
-            {
-                connection = new Socket(InetAddress.getByName(serverIP),port);
-            }catch(IOException ioEception)
-            {
-                JOptionPane.showMessageDialog(null,"Server Might Be Down!","Warning",JOptionPane.WARNING_MESSAGE);
-            }
-            status.setText("Connected to: " + connection.getInetAddress().getHostName());
-
-
-            output = new ObjectOutputStream(connection.getOutputStream());
-            output.flush();
-            input = new ObjectInputStream(connection.getInputStream());
-
-
-            /*-------------------------------------------------------------
-             * We're writing Objects instead, serialization works well.
-            /*-----------------------------------------------------------*/
-//            in = connection.getInputStream();
-//            out = connection.getOutputStream();
-
-            //dIn = new DataInputStream(in);
-            //dOut = new DataOutputStream(out);
-
-            //dOut.writeUTF(clientName);
-            //dOut.flush();
-            /*-----------------------------------------------------------*/
-
-            whileChatting();
+            chatArea.append("\n" + message.getSenderName() + " - " + (String)message.getMessage());
+            //continue;
         }
-        catch(IOException ioException)
+        else if("F".equals(message.getMessageFlag())) // 2 - Handle request to upload a file.
         {
-            ioException.printStackTrace();
+            String msgText = (String)message.getMessage();
+            chatArea.append("\n" + msgText);
+
+            // Store the name of the file we want to download:
+            fileToDownload = msgText.substring(msgText.indexOf(':') + 2, msgText.indexOf(';'));
+
+            // Raise the flag for download responses:
+            waitingForDownloadResponse = true;
+
+            //continue;
+        }
+        else if("D".equals(message.getMessageFlag())) // 3 - Auto-compress and send the file in the background.
+        {
+            String[] downloadResponse = ((String) message.getMessage()).split("[|]");
+
+            // Any response besides y/Y is taken as a rejection for downloads.
+            if(!"Y".equalsIgnoreCase(downloadResponse[0]))
+            {
+                chatArea.append("\n" + message.getSenderName() + " refused to download the file.");
+            }
+            else
+            {
+                // Compress the file, send and delete the compressed file:
+                if(CompressionUtils.compressFile(downloadResponse[1]))
+                {
+                    int endIndex = downloadResponse[1].indexOf('.');
+                    endIndex = endIndex > -1 ? endIndex : downloadResponse[1].length();
+
+                    String fileName = downloadResponse[1].substring(0, endIndex) + ".zip";
+                    File fileToSend = new File(fileName);
+                    sendMessage(fileToSend, "C");
+
+                    // CLEAN UP THE ZIPPED FILES.
+                    if(fileToSend.delete())
+                    {
+                        System.out.println("System cleaned up file : " + fileName);
+                    }
+                    else
+                    {
+                        System.out.println("System failed to cleanup: " + fileName);
+                    }
+                }
+                else
+                {
+                    chatArea.append("\nError - Failed to compress the file: " + downloadResponse[1]);
+                }
+            }
+        }
+
+        // 3 - Notify the user and immediately skip if message fails the MD5 validation.
+        // TODO: DUPLICATE THIS LOGIC WHEN SERVER RECEIVES WRONG MESSAGE, IMMEDIATELY PROMPT TO RESEND
+        if(!Message.isValidMsg(message))
+        {
+            chatArea.append(String.format(
+                    "\nReceived an invalid message from <> with unique id <>",
+                    message.getSenderName(),
+                    message.getUid()));
+
+            // inform the user
+            sendMessage("Last communication was invalid. Please send again.", "R");
+            //continue;
+        }
+
+        // 3 - If text, display.
+        Object myMessageContent = message.getMessage();
+        if(myMessageContent instanceof String)
+        {
+            chatArea.append("\n" + message.getSenderName() + " - " + (String)myMessageContent);
+        }
+        else // 4 - If file content, download and inform the user.
+        {
+            File myFile = (File) myMessageContent;
+
+            if(CompressionUtils.decompress(myFile, defaultDownloadLocation))
+            {
+                chatArea.append("\n"
+                        + String.format(
+                        "Downloaded file <%s> from %s",
+                        myFile.getName(),
+                        message.getSenderName()));
+            }
+            else
+            {
+                chatArea.append("\n"
+                        + String.format(
+                        "Failed to download file <%s> from %s",
+                        myFile.getName(),
+                        message.getSenderName()));
+            }
         }
     }
 
@@ -373,7 +433,7 @@ public class Client extends javax.swing.JFrame{
               }
       }while(!message.getMessage().equals("END")); // TODO: MODIFY THIS TO MATCH CURRENT LOGIC.
     }
-    
+
     private void sendMessage(Object message, String flag){
         try{
             // Generate the message object.
@@ -437,8 +497,8 @@ public class Client extends javax.swing.JFrame{
     /*-----------------------------*/
 
     /*----------------------------------------------------------------------------------------------------------------*/
-  
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JTextField uploadTextField = null;
     private JLabel uploadFieldLabel = null;

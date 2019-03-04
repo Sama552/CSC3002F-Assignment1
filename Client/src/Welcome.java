@@ -42,6 +42,8 @@ public class Welcome extends javax.swing.JFrame {
         this.setVisible(true);
     }
 
+
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -75,13 +77,12 @@ public class Welcome extends javax.swing.JFrame {
                 Oout = new ObjectOutputStream(connection.getOutputStream());
                 Oin = new ObjectInputStream(connection.getInputStream());
 
-                System.out.println("Dkjsbskd");
-
                 String confirm = "";
 
                 Oout.writeObject(username);
                 Oout.flush();
                 try{
+                  System.out.println("OOGA BOOGA");
                   confirm = (String) Oin.readObject();
                 }catch(ClassNotFoundException c){
                   //TODO
@@ -91,7 +92,7 @@ public class Welcome extends javax.swing.JFrame {
                     // TODO
                     JOptionPane.showMessageDialog(null,"CONNECTED","Warning",JOptionPane.WARNING_MESSAGE);
                     //this.setVisible(false);
-                    Connect c = new Connect(connection, username);
+                    Connect c = new Connect(connection, username, Oin, Oout);
                 }else{
                   JOptionPane.showMessageDialog(null,"Username already in use. Please choose a different username and try again","Warning",JOptionPane.WARNING_MESSAGE);
                   connection.close();
@@ -154,44 +155,6 @@ public class Welcome extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-
-    //public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-
-        /**
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Welcome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Welcome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Welcome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Welcome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-
-        /**
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Welcome().setVisible(true);
-            }
-        });
-        */
-    //}
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

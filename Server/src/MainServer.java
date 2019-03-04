@@ -1,6 +1,6 @@
-package Server;
+//package Server;
 
-import Message.Message;
+//import Message.Message;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -50,6 +50,8 @@ public class MainServer {
         catch (Exception e) { }
 
     }
+
+
 
     class RunSocket implements Runnable {
         private Socket socket;
@@ -107,6 +109,7 @@ public class MainServer {
                   {
                       case "F":
                       case "M":
+                      case "R":
                       case "C":
                           /* Here it's easier because we have a handle to the sender in the Message Object,
                            * do something similar below.
