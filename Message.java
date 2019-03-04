@@ -41,7 +41,7 @@ public class Message implements Serializable {
         System.out.println(msg);
 
         //Saving of object in a file
-        FileOutputStream file = new FileOutputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\shit");
+        FileOutputStream file = new FileOutputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\testing");
         ObjectOutputStream out = new ObjectOutputStream(file);
 
         // Method for serialization of object
@@ -55,7 +55,7 @@ public class Message implements Serializable {
 
 
         // Reading the object from a file
-        FileInputStream file2 = new FileInputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\shit");
+        FileInputStream file2 = new FileInputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\testing");
         ObjectInputStream in = new ObjectInputStream(file2);
 
         // Method for deserialization of object
