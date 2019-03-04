@@ -14,7 +14,7 @@ public class Message implements Serializable {
     private String messageFlag;
     private Object message;
     private String uid = UUID.randomUUID().toString();
-    private ArrayList<String> recipientInfo = new ArrayList<>();
+//    private ArrayList<String> recipientInfo = new ArrayList<>();
     private String md5;
 
     public String getSenderName() {
@@ -118,7 +118,7 @@ public class Message implements Serializable {
         buffer.append('[');
         buffer.append(senderName);
         buffer.append(']');
-        buffer.append(recipientInfo);
+//        buffer.append(recipientInfo);
         buffer.append(Message.generateMd5(message));
         buffer.append(message);
 
