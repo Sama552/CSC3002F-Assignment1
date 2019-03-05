@@ -9,24 +9,46 @@ import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ListSelectionModel;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
 /**
  *
  * @author nrgsam001
  */
+
+
+
 public class Connect extends javax.swing.JFrame {
 
     private Socket connection;
-    private String username;
+    public String username;
+    ObjectOutputStream out;
+    ObjectInputStream in;
+    public volatile Map<String, Client> chats = new HashMap();
     /**
      * Creates new form Connect
      */
-    public Connect(Socket socket,String name) {
+    public Connect(Socket socket,String name, ObjectInputStream in, ObjectOutputStream out) {
         initComponents();
         this.setTitle("Connect");
         this.setVisible(true);
         this.connection = socket;
         this.username = name;
+        this.in = in;
+        this.out = out;
+        startRunning();
     }
+
+    private void startRunning(){
+      MessageListen listen = new MessageListen(this, connection, in, out);
+      Thread t = new Thread(listen);
+      t.start();
+
+    }
+
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -45,7 +67,7 @@ public class Connect extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         lstClients.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            String[] strings = { };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -96,14 +118,47 @@ public class Connect extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnConnectActionPerformed
+    private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {
+      if (lstClients.getSelectedIndex() == -1){
+        JOptionPane.showMessageDialog(null,"You didn't select anyone...","Warning",JOptionPane.WARNING_MESSAGE);
+        return;
+      }
+      String response = lstClients.getSelectedValue();
+      if(chats.containsKey(response)){
+        JOptionPane.showMessageDialog(null,"You are already connected to that guy. Stop trying to break me!","Warning",JOptionPane.WARNING_MESSAGE);
+        return;
+      }
+      Client other = new Client(connection, username, response, out);
+      Thread t = new Thread(other);
+      t.start();
+      chats.put(response, other);
+      Message sendConnect = new Message("C", username, response, "connect me");
+      try{
+        out.writeObject(sendConnect);
+      }catch(IOException e){
+        e.printStackTrace();
+      }
+    }//GEN-FIRST:event_btnConnectActionPerformed
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+
+    public void updateList(String[] names){
+      lstClients.setModel(new javax.swing.AbstractListModel<String>() {
+          String[] strings = names;
+          public int getSize() { return strings.length; }
+          public String getElementAt(int i) { return strings[i]; }
+      });
+      lstClients.updateUI();
+    }
+
     private javax.swing.JButton btnConnect;
     private javax.swing.JList<String> lstClients;
     private javax.swing.JScrollPane spClients;
     private javax.swing.JLabel title;
+
+    }//GEN-LAST:event_btnConnectActionPerformed
+
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+
     // End of variables declaration//GEN-END:variables
-}

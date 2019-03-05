@@ -53,8 +53,11 @@ all : $(addprefix $(BIN), $(CLASS_FILES))
 bin/ServerTest.class: bin/MainServer.class
 	$(COMPILE) src/ServerTest.java
 
-bin/MainServer.class:
+bin/MainServer.class: bin/Message.class
 	$(COMPILE) src/MainServer.java
+
+bin/Message.class: 
+	$(COMPILE) src/Message.java
 
 run : all
 	java -cp ./bin/ ServerTest
