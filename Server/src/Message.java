@@ -13,7 +13,7 @@ public class Message implements Serializable {
     private String messageFlag;
     private Object message;
     private String uid = UUID.randomUUID().toString();
-//    private ArrayList<String> recipientInfo = new ArrayList<>();
+    private ArrayList<String> recipientInfo = new ArrayList<>();
     private String md5;
 
     public String getSenderName() {
@@ -40,7 +40,7 @@ public class Message implements Serializable {
         System.out.println(msg);
 
         //Saving of object in a file
-        FileOutputStream file = new FileOutputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\testing");
+        FileOutputStream file = new FileOutputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\shit");
         ObjectOutputStream out = new ObjectOutputStream(file);
 
         // Method for serialization of object
@@ -54,7 +54,7 @@ public class Message implements Serializable {
 
 
         // Reading the object from a file
-        FileInputStream file2 = new FileInputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\testing");
+        FileInputStream file2 = new FileInputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\shit");
         ObjectInputStream in = new ObjectInputStream(file2);
 
         // Method for deserialization of object
@@ -117,7 +117,7 @@ public class Message implements Serializable {
         buffer.append('[');
         buffer.append(senderName);
         buffer.append(']');
-//        buffer.append(recipientInfo);
+        buffer.append(recipientInfo);
         buffer.append(Message.generateMd5(message));
         buffer.append(message);
 

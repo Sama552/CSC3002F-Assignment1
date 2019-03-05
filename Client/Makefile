@@ -56,11 +56,20 @@ bin/Client_1.class: bin/Client.class
 bin/Welcome.class: bin/Connect.class
 	$(COMPILE) src/Welcome.java
 
+bin/MessageListen.class:
+	$(COMPILE) src/MessageListen.java
+
 bin/Connect.class:
 	$(COMPILE) src/Connect.java
 
-bin/Client.class:
+bin/Client.class: bin/Message.class bin/CompressionUtils.class
 	$(COMPILE) src/Client.java
+
+bin/Message.class: bin/CompressionUtils.class
+	$(COMPILE) src/Message.java
+
+bin/CompressionUtils.class:
+	$(COMPILE) src/CompressionUtils.java
 
 run : all
 	java -cp ./bin/ Client_1
