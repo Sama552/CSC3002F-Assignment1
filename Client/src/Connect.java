@@ -124,7 +124,7 @@ public class Connect extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null,"You are already connected to that guy. Stop trying to break me!","Warning",JOptionPane.WARNING_MESSAGE);
         return;
       }
-      Client other = new Client(connection, response);
+      Client other = new Client(connection, response, out);
       Thread t = new Thread(other);
       t.start();
       chats.put(response, other);

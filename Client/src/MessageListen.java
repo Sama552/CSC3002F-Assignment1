@@ -42,7 +42,7 @@ public class MessageListen implements Runnable{
         ext.printStackTrace();
       }
       if ("C".equals(mess.getMessageFlag())){
-        Client from = new Client(conn, mess.getSenderName());
+        Client from = new Client(conn, mess.getSenderName(), out);
         mainClass.chats.put(mess.getSenderName(), from);
         Thread t = new Thread(from);
         t.start();

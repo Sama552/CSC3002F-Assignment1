@@ -24,7 +24,6 @@ public class Client extends javax.swing.JFrame implements Runnable{
     private String defaultDownloadLocation = System.getProperty("user.home") + "\\Desktop";
 
     private ObjectOutputStream output;
-    private ObjectInputStream input;
     private Message message = null;
     private String serverIP;
     private Socket connection;
@@ -41,11 +40,14 @@ public class Client extends javax.swing.JFrame implements Runnable{
 //    private DataInputStream dIn;
 //    private DataOutputStream dOut;
 
-    public Client(Socket socket, String s){
+    public Client(Socket socket, String s, ObjectOutputStream out){
 
         initComponents();
         this.connection = socket;
         this.otherClient = s;
+        this.setTitle(otherClient);
+        this.output = out;
+        this.setVisible(true);
     }
 
     @Override
@@ -319,8 +321,8 @@ public class Client extends javax.swing.JFrame implements Runnable{
         }
     }
 
-
-    private void whileChatting() throws IOException{
+/*
+    private void whileChatting() throws IOException{ // Deprecated
       jTextField1.setEditable(true);
       do{
               try{
@@ -433,6 +435,8 @@ public class Client extends javax.swing.JFrame implements Runnable{
               }
       }while(!message.getMessage().equals("END")); // TODO: MODIFY THIS TO MATCH CURRENT LOGIC.
     }
+
+*/
 
     private void sendMessage(Object message, String flag){
         try{
