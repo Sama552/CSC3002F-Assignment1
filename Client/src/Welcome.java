@@ -42,6 +42,8 @@ public class Welcome extends javax.swing.JFrame {
         this.setVisible(true);
     }
 
+
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -62,44 +64,7 @@ public class Welcome extends javax.swing.JFrame {
 
         ActionListener listener = new ActionListener(){
 		        public void actionPerformed(ActionEvent evt){
-              serverIP = txtIP.getText();
-              username = txtName.getText();
-
-              try{
-                  try{
-                    connection = new Socket(InetAddress.getByName(serverIP),port);
-                  }catch(IOException ioEception){
-                    JOptionPane.showMessageDialog(null,"Could not connect to server at " + serverIP + ". Please check if the server is running and try again","Warning",JOptionPane.WARNING_MESSAGE);
-                  }
-
-                Oout = new ObjectOutputStream(connection.getOutputStream());
-                Oin = new ObjectInputStream(connection.getInputStream());
-
-                System.out.println("Dkjsbskd");
-
-                String confirm = "";
-
-                Oout.writeObject(username);
-                Oout.flush();
-                try{
-                  confirm = (String) Oin.readObject();
-                }catch(ClassNotFoundException c){
-                  //TODO
-                }
-
-                if (confirm.equals("OK")){
-                    // TODO
-                    JOptionPane.showMessageDialog(null,"CONNECTED","Warning",JOptionPane.WARNING_MESSAGE);
-                    //this.setVisible(false);
-                    Connect c = new Connect(connection, username);
-                }else{
-                  JOptionPane.showMessageDialog(null,"Username already in use. Please choose a different username and try again","Warning",JOptionPane.WARNING_MESSAGE);
-                  connection.close();
-                  txtName.setText("");
-                }
-              }catch(IOException e){
-                  e.printStackTrace();
-              }
+                btnStartActionPerformed(evt);
 		        }
 	      };
         btnStart.addActionListener(listener);
@@ -155,44 +120,42 @@ public class Welcome extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnStartActionPerformed(java.awt.event.ActionEvent evt){
+      serverIP = txtIP.getText();
+      username = txtName.getText();
+      try{
+          try{
+            connection = new Socket(InetAddress.getByName(serverIP),port);
+          }catch(IOException ioEception){
+            JOptionPane.showMessageDialog(null,"Could not connect to server at " + serverIP + ". Please check if the server is running and try again","Warning",JOptionPane.WARNING_MESSAGE);
+          }
 
-    //public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
+        Oout = new ObjectOutputStream(connection.getOutputStream());
+        Oin = new ObjectInputStream(connection.getInputStream());
 
-        /**
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Welcome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Welcome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Welcome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Welcome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        String confirm = "";
+
+        Oout.writeObject(username);
+        Oout.flush();
+        try{
+          confirm = (String) Oin.readObject();
+        }catch(ClassNotFoundException c){
+          //TODO
         }
-        //</editor-fold>
 
-        /* Create and display the form */
-
-        /**
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Welcome().setVisible(true);
-            }
-        });
-        */
-    //}
-
+        if (confirm.equals("OK")){
+            this.setVisible(false);
+            Connect c = new Connect(connection, username, Oin, Oout);
+            JOptionPane.showMessageDialog(null,"CONNECTED","Warning",JOptionPane.WARNING_MESSAGE);
+        }else{
+          JOptionPane.showMessageDialog(null,"Username already in use. Please choose a different username and try again","Warning",JOptionPane.WARNING_MESSAGE);
+          connection.close();
+          txtName.setText("");
+        }
+      }catch(IOException e){
+          e.printStackTrace();
+      }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnStart;
