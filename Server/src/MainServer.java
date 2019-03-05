@@ -42,6 +42,9 @@ public class MainServer {
                 System.out.println("Got a client :) ... Finally, someone saw me through all the cover!");
                 System.out.println();
 
+                System.out.println("printinf the sendlist");
+                sendList();
+
                 RunSocket rSocket = new RunSocket(socket);
                 Thread t = new Thread(rSocket);
                 t.start();
@@ -156,5 +159,13 @@ public class MainServer {
      for (String s : names){
        System.out.println(s);
      }
+   }
+
+   private void sendList(){
+      Set<String> s = users.keySet();
+      int n = s.size();
+      String arr[] = new String[n];
+      arr = s.toArray(arr);
+      System.out.println(arr);
    }
 }
