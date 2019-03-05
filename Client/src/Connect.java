@@ -25,7 +25,7 @@ public class Connect extends javax.swing.JFrame {
     public String username;
     ObjectOutputStream out;
     ObjectInputStream in;
-    public Map<String, Client> chats = new HashMap();
+    public volatile Map<String, Client> chats = new HashMap();
     /**
      * Creates new form Connect
      */
@@ -121,8 +121,6 @@ public class Connect extends javax.swing.JFrame {
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {
       if (lstClients.getSelectedIndex() == -1){
         JOptionPane.showMessageDialog(null,"You didn't select anyone...","Warning",JOptionPane.WARNING_MESSAGE);
-        String[] s = {"Sama", "ROGER"};
-        updateList(s);
         return;
       }
       String response = lstClients.getSelectedValue();
