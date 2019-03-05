@@ -20,7 +20,7 @@ public class MainServer {
     private ServerSocket server;
     private int port = 12000;
 
-    public Map<String, Socket> users = new HashMap(); // map of usernames to socket. Google documentation on how to use
+    public Map<String, RunSocket> users = new HashMap(); // map of usernames to socket. Google documentation on how to use
 
     public MainServer() {
 
@@ -54,19 +54,27 @@ public class MainServer {
 
     class RunSocket implements Runnable {
         private Socket socket;
+        private InputStream in;
+        private OutputStream out;
+        private ObjectInputStream Oin;
+        private ObjectOutputStream Oout;
+
 
         public RunSocket(Socket socket) {
           this.socket = socket;
         }
+        public ObjectOutputStream getOutputStream(){
+           return Oout;
+         }
 
         @Override
         public void run() {
           try {
-              InputStream in = socket.getInputStream();
-              OutputStream out = socket.getOutputStream();
+               in = socket.getInputStream();
+               out = socket.getOutputStream();
 
-              ObjectInputStream Oin = new ObjectInputStream(in);
-              ObjectOutputStream Oout = new ObjectOutputStream(out);
+               Oin = new ObjectInputStream(in);
+               Oout = new ObjectOutputStream(out);
 
               String name = "";
               try{ // get the username from the client (will be the first they send after connecting)
@@ -86,7 +94,7 @@ public class MainServer {
                 Oout.flush();
               }
 
-              users.put(name, socket); // add the new username to the Map of usernames and Sockets
+              users.put(name, this); // add the new username to the Map of usernames and Sockets
               printUsers(); // Used for testing DELETE AFTER
 
               sendList();
@@ -117,7 +125,7 @@ public class MainServer {
                           if(!Message.isValidMsg(message))
                           {
                               // create output stream to the sender and send a 'resend request'.
-                              Socket senderConnection = users.get(message.getSenderName());
+                              RunSocket senderConnection = users.get(message.getSenderName());
                               ObjectOutputStream senderOutStream =
                                       new ObjectOutputStream(senderConnection.getOutputStream());
 
@@ -135,7 +143,7 @@ public class MainServer {
                           // else continue to default processing.
                       default: // valid messages or messages that don't require validation ('R', 'D')
                           // TODO: ...
-                          Socket recipientConnection = users.get(/*Please add the correct name here*/"DUMMY_NAME");
+                          RunSocket recipientConnection = users.get(/*Please add the correct name here*/"DUMMY_NAME");
                           ObjectOutputStream recipientOutStream =
                                   new ObjectOutputStream(recipientConnection.getOutputStream());
 
@@ -174,11 +182,11 @@ public class MainServer {
       for (int i = 0; i < arr.length; i++) {
           System.out.println("in loop");
           try {
-            Socket socket = users.get(arr[i]);
+            RunSocket socket = users.get(arr[i]);
+            ObjectOutputStream newOut =socket.getOutputStream();
             System.out.println("new socket");
-            OutputStream out = socket.getOutputStream();
-            ObjectOutputStream newOut = new ObjectOutputStream(out);
-            newOut.writeObject(s);
+
+            newOut.writeObject(arr);
             System.out.println("Sent a userList");
           }
             catch (Exception e) {

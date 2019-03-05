@@ -48,7 +48,8 @@ public class MessageListen implements Runnable{
         mainClass.updateList((String[])userSet.toArray());
 
         continue;
-      }else{
+      }
+      else{
         mess = (Message) inObject;
       }
       if ("C".equals(mess.getMessageFlag())){
