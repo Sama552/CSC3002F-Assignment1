@@ -112,55 +112,71 @@ public class MainServer {
                   /* Modifications
                   /*--------------------------------------------------------------------------------------------------*/
                   Message message = (Message) Oin.readObject();
+                  forward(message);
 
                   // Process messages based on the flags.
-                  switch (message.getMessageFlag())
-                  {
-                      case "F":
-                      case "M":
-                      case "C":
-                          /* Here it's easier because we have a handle to the sender in the Message Object,
-                           * do something similar below.
-                           */
-                          if(!Message.isValidMsg(message))
-                          {
-                              // create output stream to the sender and send a 'resend request'.
-                              RunSocket senderConnection = users.get(message.getSenderName());
-                              ObjectOutputStream senderOutStream =
-                                      new ObjectOutputStream(senderConnection.getOutputStream());
 
-                              senderOutStream.writeObject(new Message(
-                                      "R",
-                                      "Server",
-                                      "Last communication was invalid. Please send again."));
-                              senderOutStream.flush();
 
-                              // house-keeping.
-                              senderOutStream.close();
-
-                              break;
-                          }
-                          // else continue to default processing.
-                      default: // valid messages or messages that don't require validation ('R', 'D')
-                          // TODO: ...
-                          RunSocket recipientConnection = users.get(/*Please add the correct name here*/"DUMMY_NAME");
-                          ObjectOutputStream recipientOutStream =
-                                  new ObjectOutputStream(recipientConnection.getOutputStream());
-
-                          recipientOutStream.writeObject(message);
-                          recipientOutStream.flush();
-
-                          // house-keeping.
-                          recipientOutStream.close();
-
-                          break;
-                  }
+                  // switch (message.getMessageFlag())
+                  // {
+                  //     case "F":
+                  //     case "M":
+                  //     case "C":
+                  //         /* Here it's easier because we have a handle to the sender in the Message Object,
+                  //          * do something similar below.
+                  //          */
+                  //         if(!Message.isValidMsg(message))
+                  //         {
+                  //             // create output stream to the sender and send a 'resend request'.
+                  //             RunSocket senderConnection = users.get(message.getSenderName());
+                  //             ObjectOutputStream senderOutStream =
+                  //                     new ObjectOutputStream(senderConnection.getOutputStream());
+                  //
+                  //             senderOutStream.writeObject(new Message(
+                  //                     "R",
+                  //                     "Server",
+                  //                     "Last communication was invalid. Please send again."));
+                  //             senderOutStream.flush();
+                  //
+                  //             // house-keeping.
+                  //             senderOutStream.close();
+                  //
+                  //             break;
+                  //         }
+                  //         // else continue to default processing.
+                  //     default: // valid messages or messages that don't require validation ('R', 'D')
+                  //         // TODO: ...
+                  //         RunSocket recipientConnection = users.get(/*Please add the correct name here*/"DUMMY_NAME");
+                  //         ObjectOutputStream recipientOutStream =
+                  //                 new ObjectOutputStream(recipientConnection.getOutputStream());
+                  //
+                  //         recipientOutStream.writeObject(message);
+                  //         recipientOutStream.flush();
+                  //
+                  //         // house-keeping.
+                  //         recipientOutStream.close();
+                  //
+                  //         break;
+                  // }
                   /*--------------------------------------------------------------------------------------------------*/
                 }
               }
           catch (Exception e) { }
         }
     }
+
+   private void forward(Message m){
+     String rec = m.getRecName();
+     RunSocket soc = users.get(rec);
+     ObjectOutputStream fOut = soc.getOutputStream();
+     try{
+       fOut.writeObject(m);
+       fOut.flush();
+     }catch(IOException e){
+       e.printStackTrace();
+     }
+
+   }
 
    private void printUsers(){
      Set<String> names = users.keySet();

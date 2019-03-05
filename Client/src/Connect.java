@@ -134,7 +134,7 @@ public class Connect extends javax.swing.JFrame {
       Thread t = new Thread(other);
       t.start();
       chats.put(response, other);
-      Message sendConnect = new Message("C", username, "connect me");
+      Message sendConnect = new Message("C", username, response, "connect me");
       try{
         out.writeObject(sendConnect);
       }catch(IOException e){

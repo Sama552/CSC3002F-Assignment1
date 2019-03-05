@@ -16,11 +16,12 @@ public class Message implements Serializable {
     private ArrayList<String> recipientInfo = new ArrayList<>();
     private String md5;
 
+    private String senderName;
+    private String recName;
+
     public String getSenderName() {
         return senderName;
     }
-
-    private String senderName;
 
     public String getMd5() {
         return md5;
@@ -30,53 +31,58 @@ public class Message implements Serializable {
         return messageFlag;
     }
 
-    public static void main(String[] args) throws Exception
-    {
-//        System.out.println(Message.generateMd5("Hello World"));
-//        List<String> list = Arrays.asList("a", "b", "c");
-//        System.out.println(list);
-//        System.out.println(Message.generateMd5(new File("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\10mb.txt")));
-        Message msg = new Message("M", "M", new File("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\test.txt"));//" how now brown cow!");
-        System.out.println(msg);
-
-        //Saving of object in a file
-        FileOutputStream file = new FileOutputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\shit");
-        ObjectOutputStream out = new ObjectOutputStream(file);
-
-        // Method for serialization of object
-        out.writeObject(msg);
-
-        out.close();
-        file.close();
-
-        // Try deserialize:
-        Message msgIn = null;
-
-
-        // Reading the object from a file
-        FileInputStream file2 = new FileInputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\shit");
-        ObjectInputStream in = new ObjectInputStream(file2);
-
-        // Method for deserialization of object
-        msgIn = (Message) in.readObject();
-
-        in.close();
-        file.close();
-
-        System.out.println("Object has been deserialized ");
-        System.out.println("flag = " + msgIn.messageFlag);
-        System.out.println("messageClass = " + msgIn.getClass().getName());
-        System.out.println("message is File = " + (msgIn.message instanceof File));
-        System.out.println("message = " + new String(Files.readAllBytes(((File) msgIn.message).toPath())));
-
-//        System.out.println(Arrays.asList("a,b,c".split("[,]")));
+    public String getRecName(){
+        return recName;
     }
 
-    public Message(String messageFlag, String senderName, Object message) {
+//     public static void main(String[] args) throws Exception
+//     {
+// //        System.out.println(Message.generateMd5("Hello World"));
+// //        List<String> list = Arrays.asList("a", "b", "c");
+// //        System.out.println(list);
+// //        System.out.println(Message.generateMd5(new File("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\10mb.txt")));
+//         Message msg = new Message("M", "M", new File("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\test.txt"));//" how now brown cow!");
+//         System.out.println(msg);
+//
+//         //Saving of object in a file
+//         FileOutputStream file = new FileOutputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\shit");
+//         ObjectOutputStream out = new ObjectOutputStream(file);
+//
+//         // Method for serialization of object
+//         out.writeObject(msg);
+//
+//         out.close();
+//         file.close();
+//
+//         // Try deserialize:
+//         Message msgIn = null;
+//
+//
+//         // Reading the object from a file
+//         FileInputStream file2 = new FileInputStream("C:\\Users\\maminimini\\Desktop\\2019\\CSC3002F\\shit");
+//         ObjectInputStream in = new ObjectInputStream(file2);
+//
+//         // Method for deserialization of object
+//         msgIn = (Message) in.readObject();
+//
+//         in.close();
+//         file.close();
+//
+//         System.out.println("Object has been deserialized ");
+//         System.out.println("flag = " + msgIn.messageFlag);
+//         System.out.println("messageClass = " + msgIn.getClass().getName());
+//         System.out.println("message is File = " + (msgIn.message instanceof File));
+//         System.out.println("message = " + new String(Files.readAllBytes(((File) msgIn.message).toPath())));
+//
+// //        System.out.println(Arrays.asList("a,b,c".split("[,]")));
+//     }
+
+    public Message(String messageFlag, String senderName, String r, Object message) {
         this.messageFlag = messageFlag;
         this.senderName = senderName;
         this.message = message;
         this.md5 = Message.generateMd5(message);
+        this.recName = r;
     }
 
 //    public String getMsgToSend() {

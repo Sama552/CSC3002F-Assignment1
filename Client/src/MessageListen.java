@@ -13,6 +13,8 @@ import javax.swing.ListSelectionModel;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
 
 
 public class MessageListen implements Runnable{
@@ -35,17 +37,21 @@ public class MessageListen implements Runnable{
     while(true){
       try{
         try{
-          inObject = (Object) in.readObject();
+          inObject = in.readObject();
         }catch(ClassNotFoundException e){
           e.printStackTrace();
         }
       }catch(IOException ext){
         ext.printStackTrace();
       }
-      if (inObject instanceof Set){
-        Set<String> userSet = (Set<String>) inObject;
+      if (inObject instanceof String[]){
+        String[] inArr = (String[]) inObject;
+        Set<String> userSet = new HashSet<String>(Arrays.asList(inArr));
         userSet.remove(mainClass.username);
-        mainClass.updateList((String[])userSet.toArray());
+        int size = userSet.size();
+        String[] arr = new String[size];
+        arr = (String[]) userSet.toArray(arr);
+        mainClass.updateList(arr);
 
         continue;
       }

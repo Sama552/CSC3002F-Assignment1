@@ -441,7 +441,7 @@ public class Client extends javax.swing.JFrame implements Runnable{
     private void sendMessage(Object message, String flag){
         try{
             // Generate the message object.
-            Message toSend = new Message(flag, clientName, message);
+            Message toSend = new Message(flag, clientName, otherClient, message);
 
             // Send the message.
             output.writeObject(toSend);
