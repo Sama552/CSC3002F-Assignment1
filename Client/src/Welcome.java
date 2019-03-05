@@ -64,43 +64,7 @@ public class Welcome extends javax.swing.JFrame {
 
         ActionListener listener = new ActionListener(){
 		        public void actionPerformed(ActionEvent evt){
-              serverIP = txtIP.getText();
-              username = txtName.getText();
-
-              try{
-                  try{
-                    connection = new Socket(InetAddress.getByName(serverIP),port);
-                  }catch(IOException ioEception){
-                    JOptionPane.showMessageDialog(null,"Could not connect to server at " + serverIP + ". Please check if the server is running and try again","Warning",JOptionPane.WARNING_MESSAGE);
-                  }
-
-                Oout = new ObjectOutputStream(connection.getOutputStream());
-                Oin = new ObjectInputStream(connection.getInputStream());
-
-                String confirm = "";
-
-                Oout.writeObject(username);
-                Oout.flush();
-                try{
-                  System.out.println("OOGA BOOGA");
-                  confirm = (String) Oin.readObject();
-                }catch(ClassNotFoundException c){
-                  //TODO
-                }
-
-                if (confirm.equals("OK")){
-                    // TODO
-                    JOptionPane.showMessageDialog(null,"CONNECTED","Warning",JOptionPane.WARNING_MESSAGE);
-                    //this.setVisible(false);
-                    Connect c = new Connect(connection, username, Oin, Oout);
-                }else{
-                  JOptionPane.showMessageDialog(null,"Username already in use. Please choose a different username and try again","Warning",JOptionPane.WARNING_MESSAGE);
-                  connection.close();
-                  txtName.setText("");
-                }
-              }catch(IOException e){
-                  e.printStackTrace();
-              }
+                btnStartActionPerformed(evt);
 		        }
 	      };
         btnStart.addActionListener(listener);
@@ -156,6 +120,42 @@ public class Welcome extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnStartActionPerformed(java.awt.event.ActionEvent evt){
+      serverIP = txtIP.getText();
+      username = txtName.getText();
+      try{
+          try{
+            connection = new Socket(InetAddress.getByName(serverIP),port);
+          }catch(IOException ioEception){
+            JOptionPane.showMessageDialog(null,"Could not connect to server at " + serverIP + ". Please check if the server is running and try again","Warning",JOptionPane.WARNING_MESSAGE);
+          }
+
+        Oout = new ObjectOutputStream(connection.getOutputStream());
+        Oin = new ObjectInputStream(connection.getInputStream());
+
+        String confirm = "";
+
+        Oout.writeObject(username);
+        Oout.flush();
+        try{
+          confirm = (String) Oin.readObject();
+        }catch(ClassNotFoundException c){
+          //TODO
+        }
+
+        if (confirm.equals("OK")){
+            this.setVisible(false);
+            Connect c = new Connect(connection, username, Oin, Oout);
+            JOptionPane.showMessageDialog(null,"CONNECTED","Warning",JOptionPane.WARNING_MESSAGE);
+        }else{
+          JOptionPane.showMessageDialog(null,"Username already in use. Please choose a different username and try again","Warning",JOptionPane.WARNING_MESSAGE);
+          connection.close();
+          txtName.setText("");
+        }
+      }catch(IOException e){
+          e.printStackTrace();
+      }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnStart;

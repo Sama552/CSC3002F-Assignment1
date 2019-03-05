@@ -1,6 +1,3 @@
-//package Server;
-
-//import Message.Message;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -13,6 +10,7 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.Arrays;
 
 public class MainServer {
 
@@ -42,8 +40,8 @@ public class MainServer {
                 System.out.println("Got a client :) ... Finally, someone saw me through all the cover!");
                 System.out.println();
 
-                System.out.println("printinf the sendlist");
-                sendList();
+              //  System.out.println("printinf the sendlist");
+
 
                 RunSocket rSocket = new RunSocket(socket);
                 Thread t = new Thread(rSocket);
@@ -53,8 +51,6 @@ public class MainServer {
         catch (Exception e) { }
 
     }
-
-
 
     class RunSocket implements Runnable {
         private Socket socket;
@@ -93,6 +89,8 @@ public class MainServer {
               users.put(name, socket); // add the new username to the Map of usernames and Sockets
               printUsers(); // Used for testing DELETE AFTER
 
+              sendList();
+
               String line = null;
               while (true) { // where all the input and output is gonna happen
 //                  //TODO
@@ -112,7 +110,6 @@ public class MainServer {
                   {
                       case "F":
                       case "M":
-                      case "R":
                       case "C":
                           /* Here it's easier because we have a handle to the sender in the Message Object,
                            * do something similar below.
@@ -166,9 +163,28 @@ public class MainServer {
 
    private void sendList(){
       Set<String> s = users.keySet();
+      System.out.println("got map");
       int n = s.size();
       String arr[] = new String[n];
       arr = s.toArray(arr);
-      System.out.println(arr);
+      System.out.println("got arr");
+      System.out.println(Arrays.toString(arr));
+      //Message userList = new Message ("U","server",arr);
+      System.out.println("got message");
+      for (int i = 0; i < arr.length; i++) {
+          System.out.println("in loop");
+          try {
+            Socket socket = users.get(arr[i]);
+            System.out.println("new socket");
+            OutputStream out = socket.getOutputStream();
+            ObjectOutputStream newOut = new ObjectOutputStream(out);
+            newOut.writeObject(s);
+            System.out.println("Sent a userList");
+          }
+            catch (Exception e) {
+            }
+
+      }
+      System.out.println(Arrays.toString(arr));
    }
 }

@@ -30,16 +30,26 @@ public class MessageListen implements Runnable{
 
   @Override
   public void run() {
+    Object inObject = null;
     Message mess = null;
     while(true){
       try{
         try{
-          mess = (Message) in.readObject();
+          inObject = (Object) in.readObject();
         }catch(ClassNotFoundException e){
           e.printStackTrace();
         }
       }catch(IOException ext){
         ext.printStackTrace();
+      }
+      if (inObject instanceof Set){
+        Set<String> userSet = (Set<String>) inObject;
+        userSet.remove(mainClass.username);
+        mainClass.updateList((String[])userSet.toArray());
+
+        continue;
+      }else{
+        mess = (Message) inObject;
       }
       if ("C".equals(mess.getMessageFlag())){
         Client from = new Client(conn, mess.getSenderName(), out);
