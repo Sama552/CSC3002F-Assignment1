@@ -16,10 +16,13 @@ import java.util.Set;
  *
  * @author nrgsam001
  */
+
+
+
 public class Connect extends javax.swing.JFrame {
 
     private Socket connection;
-    private String username;
+    public String username;
     ObjectOutputStream out;
     ObjectInputStream in;
     public Map<String, Client> chats = new HashMap();
@@ -64,7 +67,7 @@ public class Connect extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         lstClients.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Sama", "Mike", "Arnold", "Item 4", "Item 5" };
+            String[] strings = { };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -118,6 +121,9 @@ public class Connect extends javax.swing.JFrame {
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {
       if (lstClients.getSelectedIndex() == -1){
         JOptionPane.showMessageDialog(null,"You didn't select anyone...","Warning",JOptionPane.WARNING_MESSAGE);
+        String[] s = {"Sama", "ROGER"};
+        updateList(s);
+        return;
       }
       String response = lstClients.getSelectedValue();
       if(chats.containsKey(response)){
@@ -135,6 +141,16 @@ public class Connect extends javax.swing.JFrame {
         e.printStackTrace();
       }
     }//GEN-FIRST:event_btnConnectActionPerformed
+
+
+    public void updateList(String[] names){
+      lstClients.setModel(new javax.swing.AbstractListModel<String>() {
+          String[] strings = names;
+          public int getSize() { return strings.length; }
+          public String getElementAt(int i) { return strings[i]; }
+      });
+      lstClients.updateUI();
+    }
 
     private javax.swing.JButton btnConnect;
     private javax.swing.JList<String> lstClients;
