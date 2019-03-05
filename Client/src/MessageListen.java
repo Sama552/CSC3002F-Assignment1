@@ -59,7 +59,7 @@ public class MessageListen implements Runnable{
         mess = (Message) inObject;
       }
       if ("C".equals(mess.getMessageFlag())){
-        Client from = new Client(conn, mess.getSenderName(), out);
+        Client from = new Client(conn, mainClass.username, mess.getSenderName(), out);
         mainClass.chats.put(mess.getSenderName(), from);
         Thread t = new Thread(from);
         t.start();

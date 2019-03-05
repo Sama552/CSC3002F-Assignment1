@@ -40,11 +40,12 @@ public class Client extends javax.swing.JFrame implements Runnable{
 //    private DataInputStream dIn;
 //    private DataOutputStream dOut;
 
-    public Client(Socket socket, String s, ObjectOutputStream out){
+    public Client(Socket socket, String thisClient, String other , ObjectOutputStream out){
 
         initComponents();
         this.connection = socket;
-        this.otherClient = s;
+        this.clientName = thisClient;
+        this.otherClient = other;
         this.setTitle(otherClient);
         this.output = out;
         this.setVisible(true);
@@ -181,11 +182,9 @@ public class Client extends javax.swing.JFrame implements Runnable{
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    // TODO: REMOVE THIS PART
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_jTextField1ActionPerformed
-
         sendMessage(jTextField1.getText(), "M");
-	    jTextField1.setText("");
+	      jTextField1.setText("");
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_jButton1ActionPerformed
@@ -331,7 +330,7 @@ public class Client extends javax.swing.JFrame implements Runnable{
             // Send the message.
             output.writeObject(toSend);
             output.flush();
-            chatArea.append("\n" + clientName + " - " + message);
+            chatArea.append("\n" + "Me" + " - " + message);
 
             // Add the sent message to the Client's message list.
             messages.add(toSend);
