@@ -321,9 +321,10 @@ public class Client extends javax.swing.JFrame implements Runnable{
         }
         else // 4 - If file content, download and inform the user.
         {
+            System.out.println("got file");
             File myFile = (File) myMessageContent;
 
-            if(CompressionUtils.decompress(myFile, defaultDownloadLocation))
+            if(CompressionUtils.decompress(myFile , "./test.zip"))
             {
                 chatArea.append("\n"
                         + String.format(
