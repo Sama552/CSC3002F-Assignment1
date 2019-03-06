@@ -21,6 +21,8 @@ import java.util.Set;
 
 public class Connect extends javax.swing.JFrame {
 
+    public static boolean createPanel;
+
     private Socket connection;
     public String username;
     ObjectOutputStream out;
@@ -118,7 +120,8 @@ public class Connect extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnConnectActionPerformed(java.awt.event.ActionEvent evt)   {
+      createPanel=true;
       if (lstClients.getSelectedIndex() == -1){
         JOptionPane.showMessageDialog(null,"You didn't select anyone...","Warning",JOptionPane.WARNING_MESSAGE);
         return;
@@ -128,16 +131,29 @@ public class Connect extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null,"You are already connected to that guy. Stop trying to break me!","Warning",JOptionPane.WARNING_MESSAGE);
         return;
       }
-      Client other = new Client(connection, username, response, out);
-      Thread t = new Thread(other);
-      t.start();
-      chats.put(response, other);
+
       Message sendConnect = new Message("C", username, response, "connect me");
       try{
         out.writeObject(sendConnect);
       }catch(IOException e){
         e.printStackTrace();
       }
+      try{
+      Thread.sleep(1000);
+      }
+      catch(Exception e) {
+      }
+      //for (int j=0;j<10000000;j++);
+      if (createPanel){
+        Client other = new Client(connection, username, response, out);
+        Thread t = new Thread(other);
+        t.start();
+        chats.put(response, other);
+      }
+      else {
+        JOptionPane.showMessageDialog(null,"That user is no longer available. Please choose another user","Warning",JOptionPane.WARNING_MESSAGE);
+      }
+
     }//GEN-FIRST:event_btnConnectActionPerformed
 
 
@@ -148,6 +164,8 @@ public class Connect extends javax.swing.JFrame {
           public String getElementAt(int i) { return strings[i]; }
       });
       lstClients.updateUI();
+
+
     }
 
     private javax.swing.JButton btnConnect;

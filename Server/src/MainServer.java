@@ -112,52 +112,55 @@ public class MainServer {
                   /* Modifications
                   /*--------------------------------------------------------------------------------------------------*/
                   Message message = (Message) Oin.readObject();
-                  forward(message);
-
-                  // Process messages based on the flags.
 
 
-                  // switch (message.getMessageFlag())
-                  // {
-                  //     case "F":
-                  //     case "M":
-                  //     case "C":
-                  //         /* Here it's easier because we have a handle to the sender in the Message Object,
-                  //          * do something similar below.
-                  //          */
-                  //         if(!Message.isValidMsg(message))
-                  //         {
-                  //             // create output stream to the sender and send a 'resend request'.
-                  //             RunSocket senderConnection = users.get(message.getSenderName());
-                  //             ObjectOutputStream senderOutStream =
-                  //                     new ObjectOutputStream(senderConnection.getOutputStream());
-                  //
-                  //             senderOutStream.writeObject(new Message(
-                  //                     "R",
-                  //                     "Server",
-                  //                     "Last communication was invalid. Please send again."));
-                  //             senderOutStream.flush();
-                  //
-                  //             // house-keeping.
-                  //             senderOutStream.close();
-                  //
-                  //             break;
-                  //         }
-                  //         // else continue to default processing.
-                  //     default: // valid messages or messages that don't require validation ('R', 'D')
-                  //         // TODO: ...
-                  //         RunSocket recipientConnection = users.get(/*Please add the correct name here*/"DUMMY_NAME");
-                  //         ObjectOutputStream recipientOutStream =
-                  //                 new ObjectOutputStream(recipientConnection.getOutputStream());
-                  //
-                  //         recipientOutStream.writeObject(message);
-                  //         recipientOutStream.flush();
-                  //
-                  //         // house-keeping.
-                  //         recipientOutStream.close();
-                  //
-                  //         break;
-                  // }
+                  //Process messages based on the flags.
+
+
+                  switch (message.getMessageFlag())
+                  {
+                      case "F":
+                      case "M":
+                        //forward(message);
+                      case "C":
+                          /* Here it's easier because we have a handle to the sender in the Message Object,
+                           * do something similar below.
+                           */
+                          if(!Message.isValidMsg(message))
+                          {
+                              // create output stream to the sender and send a 'resend request'.
+                              RunSocket senderConnection = users.get(message.getSenderName());
+                              ObjectOutputStream senderOutStream =
+                                      new ObjectOutputStream(senderConnection.getOutputStream());
+
+                              senderOutStream.writeObject(new Message(
+                                      "R",
+                                      "Server",
+                                      message.getSenderName(),
+                                      "Last communication was invalid. Please send again."));
+                              senderOutStream.flush();
+
+                              // house-keeping.
+                              senderOutStream.close();
+
+                              break;
+                          }
+                          // else continue to default processing.
+                      default: // valid messages or messages that don't require validation ('R', 'D')
+                          // // TODO: ...
+                          // RunSocket recipientConnection = users.get(/*Please add the correct name here*/"DUMMY_NAME");
+                          // ObjectOutputStream recipientOutStream =
+                          //         new ObjectOutputStream(recipientConnection.getOutputStream());
+                          //
+                          // recipientOutStream.writeObject(message);
+                          // recipientOutStream.flush();
+                          //
+                          // // house-keeping.
+                          // recipientOutStream.close();
+                          //
+                          // break;
+                          forward(message);
+                  }
                   /*--------------------------------------------------------------------------------------------------*/
                 }
               }
@@ -173,7 +176,13 @@ public class MainServer {
        fOut.writeObject(m);
        fOut.flush();
      }catch(IOException e){
-       e.printStackTrace();
+       //printUsers();
+       //use name to remove key form set
+       //System.out.println("remove from map");
+       users.remove(rec);
+       //printUsers();
+       sendList();
+       //e.printStackTrace();
      }
 
    }
@@ -187,23 +196,23 @@ public class MainServer {
 
    private void sendList(){
       Set<String> s = users.keySet();
-      System.out.println("got map");
+      //System.out.println("got map");
       int n = s.size();
       String arr[] = new String[n];
       arr = s.toArray(arr);
-      System.out.println("got arr");
+      //System.out.println("got arr");
       System.out.println(Arrays.toString(arr));
       //Message userList = new Message ("U","server",arr);
-      System.out.println("got message");
+      //System.out.println("got message");
       for (int i = 0; i < arr.length; i++) {
-          System.out.println("in loop");
+          //System.out.println("in loop");
           try {
             RunSocket socket = users.get(arr[i]);
             ObjectOutputStream newOut =socket.getOutputStream();
-            System.out.println("new socket");
+            //System.out.println("new socket");
 
             newOut.writeObject(arr);
-            System.out.println("Sent a userList");
+            //System.out.println("Sent a userList");
           }
             catch (Exception e) {
             }
