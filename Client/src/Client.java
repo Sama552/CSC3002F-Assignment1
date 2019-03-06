@@ -49,6 +49,7 @@ public class Client extends javax.swing.JFrame implements Runnable{
         this.setTitle(otherClient);
         this.output = out;
         this.setVisible(true);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     @Override
@@ -113,9 +114,6 @@ public class Client extends javax.swing.JFrame implements Runnable{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        // Custom components:
-        uploadTextField = new JTextField();
-
         jPanel1 = new javax.swing.JPanel();
         jTextField1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
@@ -124,6 +122,10 @@ public class Client extends javax.swing.JFrame implements Runnable{
         jLabel2 = new javax.swing.JLabel();
         status = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
+        txtFileName = new javax.swing.JTextField();
+        lblFileTitle = new javax.swing.JLabel();
+        lblFileName = new javax.swing.JLabel();
+        btnSendFile = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -136,7 +138,7 @@ public class Client extends javax.swing.JFrame implements Runnable{
             }
         });
         jPanel1.add(jTextField1);
-        jTextField1.setBounds(30, 50, 270, 30);
+        jTextField1.setBounds(30, 390, 390, 30);
 
         jButton1.setText("Send");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -145,86 +147,105 @@ public class Client extends javax.swing.JFrame implements Runnable{
             }
         });
         jPanel1.add(jButton1);
-        jButton1.setBounds(310, 50, 80, 30);
+        jButton1.setBounds(430, 390, 80, 30);
 
         chatArea.setColumns(20);
         chatArea.setRows(5);
         jScrollPane1.setViewportView(chatArea);
 
         jPanel1.add(jScrollPane1);
-        jScrollPane1.setBounds(30, 110, 360, 270);
+        jScrollPane1.setBounds(30, 40, 480, 350);
 
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Write your text here");
         jPanel1.add(jLabel2);
-        jLabel2.setBounds(30, 30, 150, 20);
+        jLabel2.setBounds(30, 10, 150, 20);
 
         status.setText("...");
         jPanel1.add(status);
-        status.setBounds(30, 80, 300, 40);
-
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/bg7.jpg"))); // NOI18N
+        status.setBounds(40, 10, 300, 40);
         jPanel1.add(jLabel1);
         jLabel1.setBounds(0, 0, 420, 410);
+        jPanel1.add(txtFileName);
+        txtFileName.setBounds(110, 460, 270, 27);
+
+        lblFileTitle.setText("To send a file. Make sure it is in the Client folder.");
+        jPanel1.add(lblFileTitle);
+        lblFileTitle.setBounds(30, 430, 340, 30);
+
+        lblFileName.setText("File name :");
+        jPanel1.add(lblFileName);
+        lblFileName.setBounds(30, 470, 90, 17);
+
+        btnSendFile.setText("Send file");
+        btnSendFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSendFileActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnSendFile);
+        btnSendFile.setBounds(390, 460, 110, 29);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 555, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        setSize(new java.awt.Dimension(414, 428));
+        setSize(new java.awt.Dimension(558, 542));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_jTextField1ActionPerformed
-        sendMessage(jTextField1.getText(), "M");
-	      jTextField1.setText("");
+        jButton1ActionPerformed(evt);
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_jButton1ActionPerformed
-        /* If the server and other user are waiting for a download response, this should be flagged as a download
-         * response.
-         */
-        if(waitingForDownloadResponse)
-        {
-            sendMessage(fileToDownload + "|" + jTextField1.getText(), "D");
-            jTextField1.setText("");
+      /* If the server and other user are waiting for a download response, this should be flagged as a download
+      * response.
+      */
+     if(waitingForDownloadResponse)
+     {
+         sendMessage(jTextField1.getText() + "|" + fileToDownload, "D");
+         jTextField1.setText("");
 
-            // change the flag.
-            waitingForDownloadResponse = false;
+         // change the flag.
+         waitingForDownloadResponse = false;
 
-            return;
-        }
+         return;
+     }else{
+        sendMessage(jTextField1.getText(), "M");
+        jTextField1.setText("");
+     }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void btnSendFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendFileActionPerformed
         // If uploads field is populated, it sends a file instead.
         // The logic is such that the sender sends the upload request, and once atleast one person confirms, the program
         // zips the file and uploads it in the background to the server which passes it on.
-        String uploadFileName = uploadTextField.getText();
-        if(!uploadFileName.isEmpty())
+        String uploadFileName = txtFileName.getText();
+        if(!txtFileName.getText().isEmpty())
         {
             sendMessage(
                     String.format(downloadMsg, uploadFileName, clientName, CompressionUtils.getFileSize(uploadFileName)),
                     "F");
         }
-        else
-        {
-            sendMessage(jTextField1.getText(), "M");
-            jTextField1.setText("");
-        }
-    }//GEN-LAST:event_jButton1ActionPerformed
+        txtFileName.setText("");
+    }//GEN-LAST:event_btnSendFileActionPerformed
 
     public void receivedMessage(Message in){
         message = in;
         if("R".equals(message.getMessageFlag()))
         {
             chatArea.append("\n" + message.getSenderName() + " - " + (String)message.getMessage());
-            //continue;
+            return;
         }
         else if("F".equals(message.getMessageFlag())) // 2 - Handle request to upload a file.
         {
@@ -237,11 +258,13 @@ public class Client extends javax.swing.JFrame implements Runnable{
             // Raise the flag for download responses:
             waitingForDownloadResponse = true;
 
-            //continue;
+            return;
         }
         else if("D".equals(message.getMessageFlag())) // 3 - Auto-compress and send the file in the background.
         {
             String[] downloadResponse = ((String) message.getMessage()).split("[|]");
+            System.out.println("sending file");
+            System.out.println("name: " + downloadResponse[1]);
 
             // Any response besides y/Y is taken as a rejection for downloads.
             if(!"Y".equalsIgnoreCase(downloadResponse[0]))
@@ -253,12 +276,12 @@ public class Client extends javax.swing.JFrame implements Runnable{
                 // Compress the file, send and delete the compressed file:
                 if(CompressionUtils.compressFile(downloadResponse[1]))
                 {
-                    int endIndex = downloadResponse[1].indexOf('.');
+                    int endIndex = downloadResponse[1].lastIndexOf('.');
                     endIndex = endIndex > -1 ? endIndex : downloadResponse[1].length();
 
                     String fileName = downloadResponse[1].substring(0, endIndex) + ".zip";
                     File fileToSend = new File(fileName);
-                    sendMessage(fileToSend, "C");
+                    sendMessage(fileToSend, "S");
 
                     // CLEAN UP THE ZIPPED FILES.
                     if(fileToSend.delete())
@@ -278,11 +301,10 @@ public class Client extends javax.swing.JFrame implements Runnable{
         }
 
         // 3 - Notify the user and immediately skip if message fails the MD5 validation.
-        // TODO: DUPLICATE THIS LOGIC WHEN SERVER RECEIVES WRONG MESSAGE, IMMEDIATELY PROMPT TO RESEND
         if(!Message.isValidMsg(message))
         {
             chatArea.append(String.format(
-                    "\nReceived an invalid message from <> with unique id <>",
+                    "\nReceived an invalid message from <%s> with unique id <%s>",
                     message.getSenderName(),
                     message.getUid()));
 
@@ -330,7 +352,9 @@ public class Client extends javax.swing.JFrame implements Runnable{
             // Send the message.
             output.writeObject(toSend);
             output.flush();
-            chatArea.append("\n" + "Me" + " - " + message);
+            if (!flag.equals("F")){
+                chatArea.append("\n" + "Me" + " - " + message);
+            }
 
             // Add the sent message to the Client's message list.
             messages.add(toSend);
@@ -388,10 +412,7 @@ public class Client extends javax.swing.JFrame implements Runnable{
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JTextField uploadTextField = null;
-    private JLabel uploadFieldLabel = null;
-
-
+    private javax.swing.JButton btnSendFile;
     private javax.swing.JTextArea chatArea;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
@@ -399,6 +420,9 @@ public class Client extends javax.swing.JFrame implements Runnable{
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel lblFileName;
+    private javax.swing.JLabel lblFileTitle;
     private javax.swing.JLabel status;
+    private javax.swing.JTextField txtFileName;
     // End of variables declaration//GEN-END:variables
 }

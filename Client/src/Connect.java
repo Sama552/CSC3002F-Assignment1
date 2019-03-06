@@ -12,6 +12,7 @@ import javax.swing.ListSelectionModel;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.io.File;
 /**
  *
  * @author nrgsam001
@@ -37,6 +38,7 @@ public class Connect extends javax.swing.JFrame {
         this.username = name;
         this.in = in;
         this.out = out;
+        System.out.println(new File(".").getAbsoluteFile());
         startRunning();
     }
 
