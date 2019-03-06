@@ -23,6 +23,7 @@ public class MessageListen implements Runnable{
   private ObjectOutputStream out;
   private Connect mainClass;
 
+
   public MessageListen(Connect c, Socket socket, ObjectInputStream in, ObjectOutputStream out){
     conn = socket;
     mainClass = c;
@@ -52,6 +53,7 @@ public class MessageListen implements Runnable{
         String[] arr = new String[size];
         arr = (String[]) userSet.toArray(arr);
         mainClass.updateList(arr);
+        Connect.createPanel=false;
 
         continue;
       }
