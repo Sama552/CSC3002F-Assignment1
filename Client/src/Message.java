@@ -156,6 +156,7 @@ public class Message implements Serializable {
             else
             {
                 messageDigest = md.digest(Files.readAllBytes(((File) input).toPath()));
+                //messageDigest = md.digest(((File) input).getBytes());
             }
 
             // Convert byte array into signum representation
