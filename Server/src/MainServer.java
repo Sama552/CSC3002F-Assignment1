@@ -173,7 +173,13 @@ public class MainServer {
        fOut.writeObject(m);
        fOut.flush();
      }catch(IOException e){
-       e.printStackTrace();
+       //printUsers();
+       //use name to remove key form set
+       //System.out.println("remove from map");
+       users.remove(rec);
+       //printUsers();
+       sendList();
+       //e.printStackTrace();
      }
 
    }
@@ -187,23 +193,23 @@ public class MainServer {
 
    private void sendList(){
       Set<String> s = users.keySet();
-      System.out.println("got map");
+      //System.out.println("got map");
       int n = s.size();
       String arr[] = new String[n];
       arr = s.toArray(arr);
-      System.out.println("got arr");
+      //System.out.println("got arr");
       System.out.println(Arrays.toString(arr));
       //Message userList = new Message ("U","server",arr);
-      System.out.println("got message");
+      //System.out.println("got message");
       for (int i = 0; i < arr.length; i++) {
-          System.out.println("in loop");
+          //System.out.println("in loop");
           try {
             RunSocket socket = users.get(arr[i]);
             ObjectOutputStream newOut =socket.getOutputStream();
-            System.out.println("new socket");
+            //System.out.println("new socket");
 
             newOut.writeObject(arr);
-            System.out.println("Sent a userList");
+            //System.out.println("Sent a userList");
           }
             catch (Exception e) {
             }
