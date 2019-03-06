@@ -150,6 +150,9 @@ public class Connect extends javax.swing.JFrame {
         t.start();
         chats.put(response, other);
       }
+      else {
+        JOptionPane.showMessageDialog(null,"That user is no longer available. Please choose another user","Warning",JOptionPane.WARNING_MESSAGE);
+      }
 
     }//GEN-FIRST:event_btnConnectActionPerformed
 
@@ -161,14 +164,6 @@ public class Connect extends javax.swing.JFrame {
           public String getElementAt(int i) { return strings[i]; }
       });
       lstClients.updateUI();
-
-
-      //check if names matches chats
-      for (String name : names) {
-        if (!chats.containsKey(name)){
-          System.out.println(name+" has dc");
-        }
-      }
 
 
     }
