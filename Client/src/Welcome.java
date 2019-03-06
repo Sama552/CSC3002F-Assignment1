@@ -123,6 +123,10 @@ public class Welcome extends javax.swing.JFrame {
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt){
       serverIP = txtIP.getText();
       username = txtName.getText();
+      if (username.equals("")){
+        JOptionPane.showMessageDialog(null,"Please enter a username","Warning",JOptionPane.WARNING_MESSAGE);
+        return;
+      }
       try{
           try{
             connection = new Socket(InetAddress.getByName(serverIP),port);
@@ -146,11 +150,12 @@ public class Welcome extends javax.swing.JFrame {
         if (confirm.equals("OK")){
             this.setVisible(false);
             Connect c = new Connect(connection, username, Oin, Oout);
-            JOptionPane.showMessageDialog(null,"CONNECTED","Warning",JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null,"CONNECTED","Success",JOptionPane.INFORMATION_MESSAGE);
         }else{
-          JOptionPane.showMessageDialog(null,"Username already in use. Please choose a different username and try again","Warning",JOptionPane.WARNING_MESSAGE);
-          connection.close();
-          txtName.setText("");
+            JOptionPane.showMessageDialog(null,"Username already in use. Please choose a different username and try again","Warning",JOptionPane.WARNING_MESSAGE);
+            connection.close();
+            txtName.setText("");
+            return;
         }
       }catch(IOException e){
           e.printStackTrace();

@@ -41,7 +41,7 @@ public class CompressionUtils
             pathEndIndex = fileName.lastIndexOf("\\");
         }
 
-        return compressFile(fileName, fileName.substring(0, pathEndIndex));
+        return compressFile(fileName, fileName.substring(0, pathEndIndex) + "/test.zip");
     }
 
     /**
@@ -116,7 +116,7 @@ public class CompressionUtils
             pathEndIndex = fileName.lastIndexOf("\\");
         }
 
-        return decompress(fileName, fileName.substring(0, pathEndIndex));
+        return decompress(fileName, fileName.substring(0, pathEndIndex) + "/test.zip");
     }
 
     public static boolean decompress(File file, String destination)
