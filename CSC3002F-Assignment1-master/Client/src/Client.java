@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
 
+import java.io.FileWriter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -298,6 +299,9 @@ public class Client extends javax.swing.JFrame implements Runnable{
                     chatArea.append("\nError - Failed to compress the file: " + downloadResponse[1]);
                 }
             }
+			
+			// Update the waiting flag.
+			waitingForDownloadResponse = false;
         }
 
         // 3 - Notify the user and immediately skip if message fails the MD5 validation.
@@ -317,19 +321,24 @@ public class Client extends javax.swing.JFrame implements Runnable{
         Object myMessageContent = message.getMessage();
         if(myMessageContent instanceof String)
         {
-            chatArea.append("\n" + message.getSenderName() + " - " + (String)myMessageContent);
+            chatArea.append("\n" + message.getRecName() + " - " + (String)myMessageContent);
         }
         else // 4 - If file content, download and inform the user.
         {
-            System.out.println("got file");
-            File myFile = new File("./", ((File) myMessageContent).getName());  // (File) myMessageContent;
+            System.out.println("got file: " + ((File) myMessageContent).getName());
+            File myFile = new File("./decompressed/", ((File) myMessageContent).getName());  // (File) myMessageContent;
 			System.out.println("File Path:" + myFile.getAbsolutePath());
 			
 			// Add file contents.
 			try
 			{
+				//FileWriter fw = new FileWriter(myFile);
+				//fw.write(new String(message.getFileMsg()));
+				//fw.close();
+				
 				FileOutputStream fos = new FileOutputStream(myFile);
 				fos.write(message.getFileMsg());
+				fos.flush();
 				System.out.println("Contents written to file:\n" + message.getFileMsg());
 				fos.close();
 			}
@@ -338,7 +347,7 @@ public class Client extends javax.swing.JFrame implements Runnable{
 				e.printStackTrace();
 			}
 			
-            if(CompressionUtils.decompress(myFile , "./decompressed"))
+            if(CompressionUtils.decompress(myFile, "./decompressed"))
             {
                 chatArea.append("\n"
                         + String.format(

@@ -33,15 +33,24 @@ public class CompressionUtils
     }
 
     // TODO: ADD THE SINGLE ARGUMENT VERSION OF THE BELOW METHOD.
-    public static boolean compressFile(String fileName)
+    public static boolean compressFile(String filePath)
     {
-        int pathEndIndex = fileName.lastIndexOf("/");
+        int pathEndIndex = filePath.lastIndexOf("/");
         if(pathEndIndex == -1)
         {
-            pathEndIndex = fileName.lastIndexOf("\\");
+            pathEndIndex = filePath.lastIndexOf("\\");
         }
-
-        return compressFile(fileName, fileName.substring(0, pathEndIndex) + "/test.zip");
+	
+		String preceding = filePath.substring(0, pathEndIndex);
+		String fileName = filePath.substring(pathEndIndex + 1);
+		int extensionPos = fileName.indexOf('.');
+		if(extensionPos != -1)
+		{
+			// remove the extension.
+			fileName = fileName.substring(0, extensionPos);
+		}
+	
+        return compressFile(filePath, preceding + System.getProperty("file.separator") + fileName + ".zip");
     }
 
     /**
@@ -135,6 +144,7 @@ public class CompressionUtils
             }
 
             byte[] buffer = new byte[1024];
+			System.out.println("ZIP to decompress: " + file.getAbsolutePath());
             zis = new ZipInputStream(new FileInputStream(file));
             ZipEntry zipEntry = zis.getNextEntry();
 
@@ -160,7 +170,7 @@ public class CompressionUtils
              * adding entries to the zip archive.
              */
             new Exception(
-                    "Unable to decompress the file: " + file.getName() + "; Source of error attached in StackTrace.",
+                    "Unable to decompress the file: " + file.getAbsolutePath() + "; Source of error attached in StackTrace.",
                     t).printStackTrace();
 
             return false;
